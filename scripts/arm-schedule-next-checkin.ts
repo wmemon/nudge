@@ -12,7 +12,8 @@ import { scheduleNextCheckin } from '../src/modules/goal-scheduling/index.js'
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
-const raw = process.argv[2]
+const args = process.argv.slice(2).filter((a) => a !== '--')
+const raw = args[0]
 if (!raw || !UUID_RE.test(raw)) {
   console.error('Usage: pnpm ops:arm-schedule -- <recipient-uuid>')
   process.exit(1)

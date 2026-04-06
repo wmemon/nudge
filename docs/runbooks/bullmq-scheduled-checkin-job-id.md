@@ -37,6 +37,8 @@ If a recipient captured a goal while this bug was live, `next_run_at` may exist 
 pnpm ops:arm-schedule -- <recipient-uuid>
 ```
 
+**Where to run it:** The machine must reach **the same Redis** the worker uses. Render’s `REDIS_URL` often uses an **internal hostname** that only resolves **inside Render** (e.g. worker shell). If you see `getaddrinfo ENOTFOUND` for a `red-…` host, run this from **Render Shell** on the worker service (or point `.env` at a Redis URL your laptop can resolve).
+
 Sending a new iMessage **does not** call `scheduleNextCheckin` when a goal already exists (inbound path only enqueues via `captureGoal` on first goal capture).
 
 ## References

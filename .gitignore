@@ -2,6 +2,8 @@ node_modules/
 dist/
 .claude/
 .env
+# Supabase CLI local state (project ref, versions)
+supabase/.temp/
 .env.*
 !.env.example
 *.log

@@ -1,0 +1,37 @@
+---
+description: Clarification gate — ask before Architecture Intake or ADR; surface assumptions and open questions
+alwaysApply: true
+---
+
+# Clarification Gate
+
+Before producing an Architecture Intake or ADR:
+
+- Ask clarifying questions first
+- Prefer questions over assumptions
+- Do not silently fill in missing requirements
+- Do not produce the ADR until key architectural gaps are resolved
+
+Always clarify:
+
+- business goal
+- user types
+- tenant / organization model
+- roles and permissions
+- core workflows
+- system inputs
+- system outputs
+- integrations
+- sync vs async expectations
+- notification requirements
+- admin / internal tooling
+- data sensitivity / PII
+- expected MVP load
+- failure tolerance / retries
+
+If something remains unknown:
+
+- mark it as Open Question
+- or mark it as Assumption explicitly
+
+Never hide assumptions.

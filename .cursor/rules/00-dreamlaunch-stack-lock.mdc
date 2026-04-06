@@ -1,0 +1,29 @@
+---
+description: DreamLaunch MVP stack lock — fixed auth, DB, storage, and architecture focus areas
+alwaysApply: true
+---
+
+# DreamLaunch MVP Stack Lock
+
+These decisions are fixed unless I explicitly override them:
+
+- **Auth (Nudge MVP override):** **No Clerk** and **no third-party end-user auth** — canonical identity = **LoopMessage recipient** + app-owned Postgres data. *(Legacy DreamLaunch default was Clerk; superseded for this product.)*
+- Database = Supabase Postgres
+- Storage = S3
+- Default backend pattern = modular monolith
+- Add a worker only if the product has webhooks, retries, imports/exports, AI jobs, scheduled jobs, sync jobs, or other long-running async work
+- Do not recommend microservices unless the PRD clearly justifies them
+- Do not reconsider **database** or **storage** during intake or ADR generation; **auth** may change only if explicitly overridden for the product
+
+During architecture work, focus only on:
+
+- backend modules / bounded contexts
+- integration boundaries
+- adapter boundaries
+- sync vs async flow design
+- worker / queue needs
+- idempotency
+- rate limiting
+- audit logs
+- security boundaries
+- observability

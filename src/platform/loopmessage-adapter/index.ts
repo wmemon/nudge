@@ -65,6 +65,7 @@ export function verifyWebhookSignature(
 }
 
 const LOOPMESSAGE_TIMEOUT_MS = 10_000
+const LOOPMESSAGE_SEND_URL = 'https://a.loopmessage.com/api/v1/message/send/'
 
 /**
  * Sends an outbound iMessage via the LoopMessage API.
@@ -84,7 +85,7 @@ export async function sendMessage(
   to: string,
   body: string,
 ): Promise<string> {
-  const response = await fetch('https://a.loopmessage.com/api/v1/message/send/', {
+  const response = await fetch(LOOPMESSAGE_SEND_URL, {
     method: 'POST',
     headers: {
       'Content-Type':  'application/json',
@@ -94,11 +95,35 @@ export async function sendMessage(
     signal: AbortSignal.timeout(LOOPMESSAGE_TIMEOUT_MS),
   })
 
+  const responseText = await response.text()
+
   if (!response.ok) {
-    throw new Error(`LoopMessage sendMessage failed with HTTP ${response.status.toString()}`)
+    const errorBodyPreview = responseText.slice(0, 320)
+    // #region agent log
+    fetch('http://127.0.0.1:7409/ingest/f87e662c-66d7-447b-b137-66b652dd7ffa', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '2e720c' },
+      body:    JSON.stringify({
+        sessionId:    '2e720c',
+        hypothesisId: 'H1',
+        location:     'platform/loopmessage-adapter/index.ts:sendMessage',
+        message:      'loopmessage send non-ok',
+        data:         { status: response.status, sendUrl: LOOPMESSAGE_SEND_URL, errorPreview: errorBodyPreview },
+        timestamp:    Date.now(),
+      }),
+    }).catch(() => {})
+    // #endregion
+    throw new Error(
+      `LoopMessage sendMessage failed with HTTP ${response.status.toString()}: ${errorBodyPreview}`,
+    )
   }
 
-  const json = await response.json() as { success?: boolean; message_id?: string }
+  let json: { success?: boolean; message_id?: string }
+  try {
+    json = JSON.parse(responseText) as { success?: boolean; message_id?: string }
+  } catch {
+    throw new Error('LoopMessage sendMessage returned invalid JSON')
+  }
   if (!json.message_id) {
     throw new Error('LoopMessage sendMessage returned no message_id')
   }

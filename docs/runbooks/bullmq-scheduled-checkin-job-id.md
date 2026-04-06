@@ -31,7 +31,13 @@ The same string must be used when **enqueueing** (`scheduleNextCheckin`) and whe
 
 ## Operational note
 
-If a recipient captured a goal while this bug was live, `next_run_at` may exist in Postgres but **no** BullMQ job was enqueued. After deploy, re-arm scheduling (e.g. trigger `scheduleNextCheckin` for that recipient via an ops path or a follow-up inbound that recomputes the schedule).
+If a recipient captured a goal while this bug was live, `next_run_at` may exist in Postgres but **no** BullMQ job was enqueued. After deploy, re-arm from a machine with the **same** `.env` as the worker (Supabase + Redis):
+
+```bash
+pnpm ops:arm-schedule -- <recipient-uuid>
+```
+
+Sending a new iMessage **does not** call `scheduleNextCheckin` when a goal already exists (inbound path only enqueues via `captureGoal` on first goal capture).
 
 ## References
 

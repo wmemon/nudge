@@ -103,20 +103,6 @@ export async function sendMessage(
 
   if (!response.ok) {
     const errorBodyPreview = responseText.slice(0, 320)
-    // #region agent log
-    fetch('http://127.0.0.1:7409/ingest/f87e662c-66d7-447b-b137-66b652dd7ffa', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '2e720c' },
-      body:    JSON.stringify({
-        sessionId:    '2e720c',
-        hypothesisId: 'H1',
-        location:     'platform/loopmessage-adapter/index.ts:sendMessage',
-        message:      'loopmessage send non-ok',
-        data:         { status: response.status, sendUrl: LOOPMESSAGE_SEND_URL, errorPreview: errorBodyPreview },
-        timestamp:    Date.now(),
-      }),
-    }).catch(() => {})
-    // #endregion
     throw new Error(
       `LoopMessage sendMessage failed with HTTP ${response.status.toString()}: ${errorBodyPreview}`,
     )

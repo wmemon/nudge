@@ -20,7 +20,6 @@ const log = createLogger({ module: 'loopmessage-adapter' })
 
 const LOOPMESSAGE_TIMEOUT_MS = 10_000
 
-/** Single source of truth — logged on failure to verify deploy bundle (debug). */
 const LOOPMESSAGE_SEND_URL = 'https://a.loopmessage.com/api/v1/message/send/'
 
 /**
@@ -65,24 +64,9 @@ export async function sendMessage(
       event:       'loopmessage.send.failed',
       correlationId,
       status:      response.status,
-      sendUrl:     LOOPMESSAGE_SEND_URL,
       errorPreview: errorBodyPreview,
       loopMessageErrorCode,
     })
-    // #region agent log
-    fetch('http://127.0.0.1:7409/ingest/f87e662c-66d7-447b-b137-66b652dd7ffa', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Debug-Session-Id': '2e720c' },
-      body:    JSON.stringify({
-        sessionId:    '2e720c',
-        hypothesisId: 'H1',
-        location:     'outbound-messaging/adapters/index.ts:sendMessage',
-        message:      'loopmessage send non-ok',
-        data:         { status: response.status, sendUrl: LOOPMESSAGE_SEND_URL, errorPreview: errorBodyPreview, loopMessageErrorCode },
-        timestamp:    Date.now(),
-      }),
-    }).catch(() => {})
-    // #endregion
     throw new ServiceUnavailableError(
       `LoopMessage sendMessage failed with status ${response.status}`,
     )

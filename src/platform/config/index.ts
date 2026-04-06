@@ -41,7 +41,8 @@ const envSchema = z.object({
   S3_FORCE_PATH_STYLE: booleanString.default('false'),
 
   // LoopMessage — optional until webhook integration is live (PH-02+)
-  LOOPMESSAGE_API_KEY: z.string().default(''),
+  // Trim avoids 401s from accidental leading/trailing whitespace in Render env values.
+  LOOPMESSAGE_API_KEY: z.string().default('').transform((s) => s.trim()),
   // Static shared-secret sent by LoopMessage in every inbound webhook request.
   // Set LOOPMESSAGE_WEBHOOK_AUTH_HEADER to match the header name configured in
   // the LoopMessage dashboard (Webhooks → Authorization Header).

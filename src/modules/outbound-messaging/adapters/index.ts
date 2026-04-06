@@ -49,12 +49,20 @@ export async function sendMessage(
 
   if (!response.ok) {
     const errorBodyPreview = responseText.slice(0, 320)
+    let loopMessageErrorCode: number | undefined
+    try {
+      const parsed = JSON.parse(responseText) as { code?: number }
+      if (typeof parsed.code === 'number') loopMessageErrorCode = parsed.code
+    } catch {
+      /* non-JSON body (e.g. HTML 404 page) */
+    }
     log.error({
       event:       'loopmessage.send.failed',
       correlationId,
       status:      response.status,
       sendUrl:     LOOPMESSAGE_SEND_URL,
       errorPreview: errorBodyPreview,
+      loopMessageErrorCode,
     })
     // #region agent log
     fetch('http://127.0.0.1:7409/ingest/f87e662c-66d7-447b-b137-66b652dd7ffa', {
@@ -65,7 +73,7 @@ export async function sendMessage(
         hypothesisId: 'H1',
         location:     'outbound-messaging/adapters/index.ts:sendMessage',
         message:      'loopmessage send non-ok',
-        data:         { status: response.status, sendUrl: LOOPMESSAGE_SEND_URL, errorPreview: errorBodyPreview },
+        data:         { status: response.status, sendUrl: LOOPMESSAGE_SEND_URL, errorPreview: errorBodyPreview, loopMessageErrorCode },
         timestamp:    Date.now(),
       }),
     }).catch(() => {})

@@ -95,17 +95,17 @@ LoopMessage provides a REST API that allows businesses to send and receive iMess
 2. User sends first message — This constitutes consent and registers the contact in LoopMessage  
 3. LoopMessage webhook fires — Inbound message is forwarded to the backend server  
 4. Backend + AI engine — Processes the message, extracts intent, generates a response  
-5. LoopMessage API call — Backend POSTs the reply to LoopMessage’s `/message/send` endpoint  
+5. LoopMessage API call — Backend POSTs the reply to LoopMessage’s send API (`POST https://a.loopmessage.com/api/v1/message/send/`)  
 6. Blue bubble delivered — Response appears in the user’s iMessage thread instantly  
 
 ### 4.2 API Integration
 
-Sending a message via LoopMessage is a simple POST request. The API accepts phone number or iCloud email as the recipient identifier:
+Sending a message via LoopMessage is a POST request per [LoopMessage send-message docs](https://docs.loopmessage.com/imessage-conversation-api/send-message.md). The API accepts phone number or iCloud email as the recipient (`contact` field):
 
-- **POST** — `https://api.loopmessage.com/message/send`
-- **Headers** — `Authorization: <API_KEY>` | `Loop-Secret-Key: <SECRET>`
-- **Body** — `{ "recipient": "+13231112233", "text": "Good morning! Did you hit the gym today? 💪" }`
-- **Response** — `200 OK` — charged only on confirmed delivery
+- **POST** — `https://a.loopmessage.com/api/v1/message/send/`
+- **Headers** — `Content-Type: application/json` | `Authorization: <Organization API Key>` (raw key; no `Bearer` prefix per [credentials](https://docs.loopmessage.com/imessage-conversation-api/credentials.md))
+- **Body** — `{ "contact": "+13231112233", "text": "Good morning! Did you hit the gym today? 💪" }`
+- **Response** — `200 OK` — request accepted for send (delivery is tracked via webhooks or status API, not implied by 200 alone)
 
 The API supports rich message types including attachments, typing indicators, read status, audio, and reactions — all available to enhance the companion experience over time.
 

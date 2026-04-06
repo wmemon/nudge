@@ -1,13 +1,12 @@
 // VID-002 Adapter Contract Note — LoopMessage Send API
 //
-// Source: https://docs.loopmessage.com/imessage-conversation-api/sending-messages
-// Confirmed: March 2026
+// Source: https://docs.loopmessage.com/imessage-conversation-api/send-message.md
+// Confirmed: April 2026
 //
-// Endpoint:  POST https://api.loopmessage.com/message/send
-// Auth:      Authorization: Bearer <LOOPMESSAGE_API_KEY>
-// Body:      { "recipient": "<E.164 or iCloud email>", "text": "<message body>" }
-// Response:  { "success": true, "message_id": "<uuid>" } on 200
-//            Non-2xx on failure — treat as transient; job will retry (AIC-003)
+// Endpoint:  POST https://a.loopmessage.com/api/v1/message/send/
+// Auth:      Authorization: <LOOPMESSAGE_API_KEY> (raw key; no Bearer per LoopMessage credentials doc)
+// Body:      { "contact": "<E.164 or iCloud email>", "text": "<message body>" }
+// Response:  JSON includes message_id on 200; non-2xx on failure — treat as transient; job will retry (AIC-003)
 //
 // Idempotency: LoopMessage does not expose a native idempotency key on the send
 // endpoint. Deduplication is handled by our outbound_send_intents table —
@@ -33,13 +32,13 @@ export async function sendMessage(
   body: string,
   correlationId?: string,
 ): Promise<string> {
-  const response = await fetch('https://api.loopmessage.com/message/send', {
+  const response = await fetch('https://a.loopmessage.com/api/v1/message/send/', {
     method: 'POST',
     headers: {
       'Content-Type':  'application/json',
-      'Authorization': `Bearer ${config.LOOPMESSAGE_API_KEY}`,
+      'Authorization': config.LOOPMESSAGE_API_KEY,
     },
-    body: JSON.stringify({ recipient: to, text: body }),
+    body: JSON.stringify({ contact: to, text: body }),
     signal: AbortSignal.timeout(LOOPMESSAGE_TIMEOUT_MS),
   })
 

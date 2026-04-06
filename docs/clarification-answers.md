@@ -25,7 +25,7 @@
 | # | Topic | Answer |
 |---|--------|--------|
 | Q2.1 | Tenant model | **A** — Single consumer product (one app, one user pool) |
-| Q2.2 | Identity / auth (round 3) | **No Clerk, no third-party auth MVP** — **Canonical user key** = **LoopMessage recipient** (phone E.164 and/or iCloud email as used with LoopMessage `recipient`). User **must send first message** (deep link onboarding) per PRD before outbound iMessage is reliable. |
+| Q2.2 | Identity / auth (round 3) | **No Clerk, no third-party auth MVP** — **Canonical user key** = **LoopMessage recipient** (phone E.164 and/or iCloud email; LoopMessage’s outbound API names this `contact` in the JSON body). User **must send first message** (deep link onboarding) per PRD before outbound iMessage is reliable. |
 | Q2.3 | Roles | **None** — **No** in-product support/admin role for MVP: **no** privileged operator UI/API to read threads or pause users. |
 
 **Note:** There is **no** “pre-Clerk” or browser **link-to-Clerk** step; linking tables in older rounds are **obsolete**.

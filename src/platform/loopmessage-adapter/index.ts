@@ -84,13 +84,13 @@ export async function sendMessage(
   to: string,
   body: string,
 ): Promise<string> {
-  const response = await fetch('https://api.loopmessage.com/message/send', {
+  const response = await fetch('https://a.loopmessage.com/api/v1/message/send/', {
     method: 'POST',
     headers: {
       'Content-Type':  'application/json',
-      'Authorization': `Bearer ${config.LOOPMESSAGE_API_KEY}`,
+      'Authorization': config.LOOPMESSAGE_API_KEY,
     },
-    body: JSON.stringify({ recipient: to, text: body }),
+    body: JSON.stringify({ contact: to, text: body }),
     signal: AbortSignal.timeout(LOOPMESSAGE_TIMEOUT_MS),
   })
 

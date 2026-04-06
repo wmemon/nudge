@@ -31,13 +31,21 @@ The same string must be used when **enqueueing** (`scheduleNextCheckin`) and whe
 
 ## Operational note
 
-If a recipient captured a goal while this bug was live, `next_run_at` may exist in Postgres but **no** BullMQ job was enqueued. After deploy, re-arm from a machine with the **same** `.env` as the worker (Supabase + Redis):
+If a recipient captured a goal while this bug was live, `next_run_at` may exist in Postgres but **no** BullMQ job was enqueued. After deploy, re-arm using **the same Supabase + Redis** as the worker.
+
+**Render Shell** (worker service): environment variables are **injected** — there is no `.env` file. Use:
 
 ```bash
 pnpm ops:arm-schedule -- <recipient-uuid>
 ```
 
-**Where to run it:** The machine must reach **the same Redis** the worker uses. Render’s `REDIS_URL` often uses an **internal hostname** that only resolves **inside Render** (e.g. worker shell). If you see `getaddrinfo ENOTFOUND` for a `red-…` host, run this from **Render Shell** on the worker service (or point `.env` at a Redis URL your laptop can resolve).
+**Local machine** (with a `.env` file):
+
+```bash
+pnpm ops:arm-schedule:local -- <recipient-uuid>
+```
+
+**Where to run it:** The process must reach **the same Redis** the worker uses. Render’s `REDIS_URL` often uses an **internal hostname** that only resolves **inside Render**. If you see `getaddrinfo ENOTFOUND` for a `red-…` host from your laptop, use **Render Shell** (or a public Redis URL for dev only).
 
 Sending a new iMessage **does not** call `scheduleNextCheckin` when a goal already exists (inbound path only enqueues via `captureGoal` on first goal capture).
 

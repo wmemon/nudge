@@ -15,7 +15,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "build": "tsc -p tsconfig.build.json",
-    "ops:arm-schedule": "node --env-file=.env ./node_modules/tsx/dist/cli.mjs scripts/arm-schedule-next-checkin.ts",
+    "ops:arm-schedule": "node ./node_modules/tsx/dist/cli.mjs scripts/arm-schedule-next-checkin.ts",
+    "ops:arm-schedule:local": "node --env-file=.env ./node_modules/tsx/dist/cli.mjs scripts/arm-schedule-next-checkin.ts",
     "prepare": "husky"
   },
   "dependencies": {

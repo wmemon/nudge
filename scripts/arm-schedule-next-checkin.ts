@@ -2,9 +2,9 @@
  * One-off: enqueue the next scheduled check-in for a recipient (BullMQ delayed job).
  * Use when goal + schedule exist in Postgres but Redis never got a job (e.g. pre-fix enqueue failure).
  *
- * Usage (from repo root, same env as the worker):
- *   pnpm ops:arm-schedule -- <recipient-uuid>
- *   node --env-file=.env ./node_modules/tsx/dist/cli.mjs scripts/arm-schedule-next-checkin.ts <recipient-uuid>
+ * Usage (from repo root; env must match the worker — Supabase + Redis):
+ *   Render Shell (injected env, no .env file): pnpm ops:arm-schedule -- <recipient-uuid>
+ *   Local with .env: pnpm ops:arm-schedule:local -- <recipient-uuid>
  */
 
 import { scheduleNextCheckin } from '../src/modules/goal-scheduling/index.js'
@@ -15,7 +15,7 @@ const UUID_RE =
 const args = process.argv.slice(2).filter((a) => a !== '--')
 const raw = args[0]
 if (!raw || !UUID_RE.test(raw)) {
-  console.error('Usage: pnpm ops:arm-schedule -- <recipient-uuid>')
+  console.error('Usage: pnpm ops:arm-schedule -- <recipient-uuid>  (Render: injected env; local: pnpm ops:arm-schedule:local -- <uuid>)')
   process.exit(1)
 }
 

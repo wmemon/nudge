@@ -26,6 +26,15 @@ const SCHEDULE_BUFFER_MINUTES = 5
 /** Check-in jobs fired more than this many minutes late are treated as missed (Q12.3) */
 export const MISSED_WINDOW_THRESHOLD_MINUTES = 60
 
+/**
+ * Deterministic BullMQ job id for a scheduled check-in at `runAt`.
+ * Uses epoch ms in the third segment — ISO timestamps contain extra `:` and break BullMQ's
+ * "exactly three colon-separated segments" rule (see docs/runbooks/bullmq-scheduled-checkin-job-id.md).
+ */
+export function scheduledCheckinQueueJobId(recipientId: string, runAt: Date): string {
+  return `checkin:${recipientId}:${runAt.getTime()}`
+}
+
 // ── Job payload type (JOB-SCHED-001) ─────────────────────────────────────────
 //
 // Produced by scheduleNextCheckin(); consumed by the scheduled-checkin worker.
@@ -190,7 +199,7 @@ export async function scheduleNextCheckin(recipientId: string): Promise<void> {
     payload,
     {
       // Deterministic jobId prevents duplicate jobs on retry (AIC-003)
-      jobId:   `checkin:${recipientId}:${nextRunAt.toISOString()}`,
+      jobId:   scheduledCheckinQueueJobId(recipientId, nextRunAt),
       delay:   delayMs,
       attempts: 3,
       backoff: { type: 'exponential', delay: 60_000 }, // 1 min base

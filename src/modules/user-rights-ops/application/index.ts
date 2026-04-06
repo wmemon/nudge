@@ -10,7 +10,7 @@ import { ServiceUnavailableError } from '../../../shared/errors/index.js'
 import { z, parseOrThrow } from '../../../shared/validation/index.js'
 import { verifyRightsToken, revokeSession } from '../../otp-verification/index.js'
 import { findRecipientById } from '../../identity-recipient/index.js'
-import { getScheduleForRecipient } from '../../goal-scheduling/index.js'
+import { getScheduleForRecipient, scheduledCheckinQueueJobId } from '../../goal-scheduling/index.js'
 import {
   computeExportSlaDeadline,
   generateExportS3Key,
@@ -381,7 +381,7 @@ export async function fulfillDelete(job: Job): Promise<void> {
     // Cancel the pending scheduled check-in job (job id is deterministic from next_run_at)
     const schedule = await getScheduleForRecipient(recipientId)
     if (schedule?.nextRunAt) {
-      const checkinJobId = `checkin:${recipientId}:${schedule.nextRunAt.toISOString()}`
+      const checkinJobId = scheduledCheckinQueueJobId(recipientId, schedule.nextRunAt)
       await getQueue(QUEUE_NAMES.SCHEDULED_CHECKIN)
         .remove(checkinJobId)
         .catch((err: unknown) => {

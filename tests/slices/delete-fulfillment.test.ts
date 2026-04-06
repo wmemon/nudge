@@ -62,6 +62,8 @@ vi.mock('../../src/modules/identity-recipient/index.js', () => ({
 
 vi.mock('../../src/modules/goal-scheduling/index.js', () => ({
   getScheduleForRecipient: vi.fn(),
+  scheduledCheckinQueueJobId: (recipientId: string, runAt: Date) =>
+    `checkin:${recipientId}:${runAt.getTime()}`,
 }))
 
 vi.mock('../../src/modules/user-rights-ops/data-access/index.js', () => ({
@@ -191,7 +193,7 @@ describe('fulfillDelete — account deletion saga (JOB-DELETE-001)', () => {
 
     // BullMQ check-in job cancelled using deterministic job id
     expect(mockQueueRemove).toHaveBeenCalledWith(
-      `checkin:${RECIPIENT_ID}:${NEXT_RUN_AT.toISOString()}`,
+      `checkin:${RECIPIENT_ID}:${NEXT_RUN_AT.getTime()}`,
     )
 
     // Recipient deleted (triggers Postgres cascade)

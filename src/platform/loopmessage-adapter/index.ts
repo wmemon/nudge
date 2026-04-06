@@ -85,6 +85,10 @@ export async function sendMessage(
   to: string,
   body: string,
 ): Promise<string> {
+  if (!config.LOOPMESSAGE_API_KEY) {
+    throw new Error('LOOPMESSAGE_API_KEY is not configured')
+  }
+
   const response = await fetch(LOOPMESSAGE_SEND_URL, {
     method: 'POST',
     headers: {

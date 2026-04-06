@@ -35,6 +35,11 @@ export async function sendMessage(
   body: string,
   correlationId?: string,
 ): Promise<string> {
+  if (!config.LOOPMESSAGE_API_KEY) {
+    log.error({ event: 'loopmessage.send.missing_api_key', correlationId })
+    throw new ServiceUnavailableError('LOOPMESSAGE_API_KEY is not configured')
+  }
+
   const response = await fetch(LOOPMESSAGE_SEND_URL, {
     method: 'POST',
     headers: {
